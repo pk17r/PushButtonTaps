@@ -1,0 +1,4 @@
+PushButtonTapsAndPress	KEYWORD1
+ButtonTapType	KEYWORD1
+pushButtonSetup	KEYWORD2
+checkButtonStatus	KEYWORD2
