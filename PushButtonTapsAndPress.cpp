@@ -44,7 +44,7 @@ void PushButtonTapsAndPress::pushButtonSetup(int buttonPin, bool activeLow, bool
   }
 }
 
-bool PushButtonTapsAndPress::_buttonActive() {
+bool PushButtonTapsAndPress::buttonActive() {
   if(_activeLow)
     return !digitalRead(_BUTTON_PIN);  //active low
   else
@@ -55,17 +55,17 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
   /*  Assumption: Microcontroller checks Button Status every 50 milliseconds or faster
       Cases:
         1. No Tap
-            _buttonActive() is LOW   &&   _lastConsecitiveTaps == 0
+            buttonActive() is LOW   &&   _lastConsecitiveTaps == 0
         2. Single Tap
-            _buttonActive() is LOW   &&   _lastConsecitiveTaps == 1   &&   (millis() - _lastButtonPressEndTimeMs) > MAX_TIME_GAP_IN_DOUBLE_TAP_MS
+            buttonActive() is LOW   &&   _lastConsecitiveTaps == 1   &&   (millis() - _lastButtonPressEndTimeMs) > MAX_TIME_GAP_IN_DOUBLE_TAP_MS
         3. Double Tap
-            _buttonActive() is HIGH   &&   _lastConsecitiveTaps == 1
+            buttonActive() is HIGH   &&   _lastConsecitiveTaps == 1
         4. Long Tap
             (_lastConsecitiveTaps == 1   &&   (millis() - _lastButtonPressStartTimeMs) > MIN_LONG_PRESS_TIME_MS)
   */
   ButtonTapType _currentButtonTap = ButtonTapType::noTap;
 
-  if(_buttonActive() && !_lastStateActive) {
+  if(buttonActive() && !_lastStateActive) {
     // push button went from low to high
     // can be a double tap
 
@@ -97,7 +97,7 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
     }
 
   }
-  else if(_buttonActive() && _lastStateActive) {
+  else if(buttonActive() && _lastStateActive) {
     // push button continues to be in high state
     // can be a long press
 
@@ -111,7 +111,7 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
     }
 
   }
-  else if(!_buttonActive() && _lastStateActive) {
+  else if(!buttonActive() && _lastStateActive) {
     // push button went from high to low
     _lastButtonPressEndTimeMs = millis();
     _lastStateActive = false;
@@ -136,7 +136,7 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
     }
     
   }
-  else if(!_buttonActive() && !_lastStateActive) {
+  else if(!buttonActive() && !_lastStateActive) {
     // push button continues to be in low state
     // last tap can be a single tap
 

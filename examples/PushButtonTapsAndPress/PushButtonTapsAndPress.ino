@@ -46,22 +46,51 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-  switch(pushBtn.checkButtonStatus()) {
-  case ButtonTapType::noTap:
-    break;
-  case ButtonTapType::singleTap:
-    Serial.println("SINGLE TAP");
-    break;
-  case ButtonTapType::doubleTap:
-    Serial.println("DOUBLE TAP");
-    break;
-  case ButtonTapType::longPress:
-    Serial.println("LONG PRESS");
-    break;
-  default:
-    Serial.println("switch case default -> code should never come here!");
-    break;
+  Serial.println();
+
+  // taking user inputs for 10 seconds
+  Serial.println("Taking User Inputs for 10 seconds");
+  unsigned long timeStartMs = millis();
+  while(millis() - timeStartMs < 10000) {
+    switch(pushBtn.checkButtonStatus()) {
+    case ButtonTapType::noTap:
+      break;
+    case ButtonTapType::singleTap:
+      Serial.println("SINGLE TAP");
+      break;
+    case ButtonTapType::doubleTap:
+      Serial.println("DOUBLE TAP");
+      break;
+    case ButtonTapType::longPress:
+      Serial.println("LONG PRESS");
+      break;
+    default:
+      Serial.println("switch case default -> code should never come here!");
+      break;
+    }
+    delay(1);
   }
-  delay(1);
+  Serial.println();
+
+  // watching for button press active or not for 10 seconds
+  Serial.println("Press Push Button!");
+  timeStartMs = millis();
+  while(millis() - timeStartMs < 10000) {
+    if(pushBtn.buttonActive()) {
+      int countSeconds = 0;
+      unsigned long buttonPressStartTimeMs = millis(); //note time of button press
+      // while button is pressed, display seconds count
+      Serial.print("Push Button Active for seconds ");
+      while(pushBtn.buttonActive() && (millis() - timeStartMs < 10000)) {
+        // display count
+        if((millis() - buttonPressStartTimeMs) / 1000 > countSeconds) {
+          countSeconds++;
+          Serial.print(" ");
+          Serial.print(countSeconds);
+        }
+      }
+    }
+  }
+  Serial.println();
+  Serial.println();
 }

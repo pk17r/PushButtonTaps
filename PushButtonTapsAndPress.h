@@ -44,6 +44,7 @@ class PushButtonTapsAndPress {
     PushButtonTapsAndPress(int buttonPin, bool activeLow, bool serialPrintTapPressTimes);
     void pushButtonSetup(int buttonPin, bool activeLow, bool serialPrintTapPressTimes);
     ButtonTapType checkButtonStatus();
+	bool buttonActive();
 
   private: 
     int _BUTTON_PIN = -1;
@@ -55,8 +56,6 @@ class PushButtonTapsAndPress {
     unsigned long _lastButtonPressEndTimeMs;
     bool _lastStateActive = false;
     int _lastConsecitiveTaps = 0;
-
-    bool _buttonActive();
 };
 
 #endif
