@@ -2,95 +2,67 @@
   Author: Prashant Kumar
 
   Push Button Taps And Press
-    - Arduino library to read Push Button as Single Tap, Double Tap or Long Press
-      without using while statements or stopping program flow
-    - setup single push button with a pull-up or pull-down 10K resistor 
-	  and a 100nF decoupling capacitor to remove button bounce.
-	- setup button as active high or low
-    - Example: Active Low schematic:
-              MCU Pin ----------------\
-	          5V/3.3V ------[10K]------\
-                                /-------\
-                            [100nF]      ]O[
-                                \-------/
-              GND ---------------------/					  
+    - Arduino library to read Debounced Push Button Output as Single Tap, Double
+      Tap or Long Press without using while statements or blocking program flow
     - classifies taps as one of 4 types (enum class ButtonTapType)
       - noTap
       - singleTap
       - doubleTap
       - longPress
-    - print button press times to serial
+    - option to set button Active Low or High. Default Active Low
+    - How to use: check button status continously using checkButtonStatus() to
+      get tap type or using buttonActiveDebounced() to get active state
+    - To get last button press times use getLastTapTimes
 */
 
 #include "PushButtonTapsAndPress.h"
 
 const int BUTTON_PIN = 17;
-//PushButtonTapsAndPress(int buttonPin, bool activeLow, bool serialPrintTapPressTimes)
-PushButtonTapsAndPress pushBtn(BUTTON_PIN, true, true);
+PushButtonTapsAndPress pushBtn(BUTTON_PIN);
+
+int tapsRecorded = 0;
+int tapTimesRead = 0;
+uint16_t firstTapMs;
+uint16_t gapBetweenTapsMs;
+uint16_t secondTapMs;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-
-  // noting 10 taps with tap press times
-  int taps = 0;
-  while(taps < 10) {
-    if(pushBtn.checkButtonStatus() != ButtonTapType::noTap)
-      taps++;
-    delay(1);
+  while(!Serial) {
+    delay(10);
   }
-
-  // turning library tap press times print function off
-  pushBtn.pushButtonSetup(BUTTON_PIN, true, false);
+  Serial.println("TAP TYPE   First : Gap : Second");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.println();
-
-  // taking user inputs for 10 seconds
-  Serial.println("Taking User Inputs for 10 seconds");
-  unsigned long timeStartMs = millis();
-  while(millis() - timeStartMs < 10000) {
-    switch(pushBtn.checkButtonStatus()) {
-    case ButtonTapType::noTap:
-      break;
-    case ButtonTapType::singleTap:
-      Serial.println("SINGLE TAP");
-      break;
-    case ButtonTapType::doubleTap:
-      Serial.println("DOUBLE TAP");
-      break;
-    case ButtonTapType::longPress:
-      Serial.println("LONG PRESS");
-      break;
-    default:
-      Serial.println("switch case default -> code should never come here!");
-      break;
+  ButtonTapType tap = pushBtn.checkButtonStatus();
+  if(tap != ButtonTapType::noTap) {
+    switch(tap) {
+      case ButtonTapType::singleTap:
+        Serial.print("SINGLE TAP ");
+        break;
+      case ButtonTapType::doubleTap:
+        Serial.print("DOUBLE TAP ");
+        break;
+      case ButtonTapType::longPress:
+        Serial.print("LONG PRESS ");
+        break;
     }
-    delay(1);
+    tapsRecorded++;
   }
-  Serial.println();
-
-  // watching for button press active or not for 10 seconds
-  Serial.println("Press Push Button!");
-  timeStartMs = millis();
-  while(millis() - timeStartMs < 10000) {
-    if(pushBtn.buttonActive()) {
-      int countSeconds = 0;
-      unsigned long buttonPressStartTimeMs = millis(); //note time of button press
-      // while button is pressed, display seconds count
-      Serial.print("Push Button Active for seconds ");
-      while(pushBtn.buttonActive() && (millis() - timeStartMs < 10000)) {
-        // display count
-        if((millis() - buttonPressStartTimeMs) / 1000 > countSeconds) {
-          countSeconds++;
-          Serial.print(" ");
-          Serial.print(countSeconds);
-        }
-      }
+  bool dataReady = false;
+  if(tapTimesRead < tapsRecorded) {
+    pushBtn.getLastTapTimes(dataReady, firstTapMs, gapBetweenTapsMs, secondTapMs);
+    if(dataReady) {
+      tapTimesRead++;
+      Serial.print(firstTapMs);
+      Serial.print("ms : ");
+      Serial.print(gapBetweenTapsMs);
+      Serial.print("ms : ");
+      Serial.print(secondTapMs);
+      Serial.println("ms");
     }
   }
-  Serial.println();
-  Serial.println();
+  delay(1);
 }

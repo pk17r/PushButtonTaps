@@ -1,4 +1,6 @@
 PushButtonTapsAndPress	KEYWORD1
 ButtonTapType	KEYWORD1
-pushButtonSetup	KEYWORD2
+setButtonActiveLow	KEYWORD2
+buttonActiveDebounced	KEYWORD2
 checkButtonStatus	KEYWORD2
+getLastTapTimes	KEYWORD2
