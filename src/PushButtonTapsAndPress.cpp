@@ -20,7 +20,7 @@
   - How to use:
   - get classified button tap byte using checkButtonStatus()
   - get button active state using buttonActiveDebounced()
-  - get last button press times use getLastTapTimes(bool &dataReady, uint16_t
+  - get last button press time using getLastTapTimes(bool &dataReady, uint16_t
     &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs)
 */
 

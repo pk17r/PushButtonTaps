@@ -1,5 +1,15 @@
-PushButtonTapsAndPress	KEYWORD1
-ButtonTapType	KEYWORD1
+##########################################
+# Syntax Coloring Map For
+##########################################
+# PushButtonTapsAndPress Class
+##########################################
+
+PushButtonTapsAndPress    KEYWORD1
+
+##########################################
+# Methods and Functions 
+##########################################	
+
 setButtonPin	KEYWORD2
 setButtonActiveLow	KEYWORD2
 buttonActiveDebounced	KEYWORD2
