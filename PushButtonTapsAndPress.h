@@ -42,6 +42,8 @@ class PushButtonTapsAndPress {
     PushButtonTapsAndPress();
     /* Constructor with button pin initialization */
     PushButtonTapsAndPress(uint8_t buttonPin);
+    /* Function to initialize button pin */
+    void setButtonPin(uint8_t buttonPin);
     /* Function to set button as Active Low or High. Default Active Low true */
     void setButtonActiveLow(bool activeLow);
     /* Get debounced active status of button. Includes 1 microsecond for debounce */

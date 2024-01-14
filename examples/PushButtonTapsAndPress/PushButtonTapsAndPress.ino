@@ -18,7 +18,7 @@
 #include "PushButtonTapsAndPress.h"
 
 const int BUTTON_PIN = 17;
-PushButtonTapsAndPress pushBtn(BUTTON_PIN);
+PushButtonTapsAndPress pushBtn;
 
 int tapsRecorded = 0;
 int tapTimesRead = 0;
@@ -29,6 +29,8 @@ uint16_t secondTapMs;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
+  pushBtn.setButtonPin(BUTTON_PIN);
+
   while(!Serial) {
     delay(10);
   }
@@ -36,6 +38,7 @@ void setup() {
 }
 
 void loop() {
+  // check for button tap
   ButtonTapType tap = pushBtn.checkButtonStatus();
   if(tap != ButtonTapType::noTap) {
     switch(tap) {
@@ -51,6 +54,7 @@ void loop() {
     }
     tapsRecorded++;
   }
+  // get last tap times
   bool dataReady = false;
   if(tapTimesRead < tapsRecorded) {
     pushBtn.getLastTapTimes(dataReady, firstTapMs, gapBetweenTapsMs, secondTapMs);

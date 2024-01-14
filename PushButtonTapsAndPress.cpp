@@ -24,6 +24,11 @@ PushButtonTapsAndPress::PushButtonTapsAndPress() {
 
 /* Constructor with button pin initialization */
 PushButtonTapsAndPress::PushButtonTapsAndPress(uint8_t buttonPin) {
+  setButtonPin(buttonPin);
+}
+
+/* Function to initialize button pin */
+void PushButtonTapsAndPress::setButtonPin(uint8_t buttonPin) {
   //initialize button
   _BUTTON_PIN = buttonPin;
   pinMode(_BUTTON_PIN, INPUT);
