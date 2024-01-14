@@ -1,18 +1,27 @@
 /*
-  Author: Prashant Kumar
-
+  Prashant Kumar
   Push Button Taps And Press
-    - Arduino library to read Debounced Push Button Output as Single Tap, Double
-      Tap or Long Press without using while statements or blocking program flow
-    - classifies taps as one of 4 types (enum class ButtonTapType)
-      - noTap
-      - singleTap
-      - doubleTap
-      - longPress
-    - option to set button Active Low or High. Default Active Low
-    - How to use: check button status continously using checkButtonStatus() to
-      get tap type or using buttonActiveDebounced() to get active state
-    - To get last button press times use getLastTapTimes
+  https://github.com/pk17r/PushButtonTapsAndPress
+
+  - Arduino library to read Debounced Push Button Output as Single Tap, Double
+    Tap or Long Press without using while statements or blocking program flow
+  - classifies taps as one of 4 types
+    - 0 -> noTap
+    - 1 -> singleTap
+    - 2 -> doubleTap
+    - 3 -> longPress
+  - option to set button Active Low or High. Default Active Low
+  - To classify the tap, there is some delay from user input to tap classification.
+  - Delays: 
+    - noTap -> 1 microsecond to debounce
+    - singleTap -> 250 milliseconds from button deactivation to give user time for doubleTap
+    - doubleTap -> as soon as second tap occurs
+    - longPress -> as soon as button is pressed for 650 milliseconds
+  - How to use:
+  - get classified button tap byte using checkButtonStatus()
+  - get button active state using buttonActiveDebounced()
+  - get last button press times use getLastTapTimes(bool &dataReady, uint16_t
+    &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs)
 */
 
 #include "PushButtonTapsAndPress.h"
@@ -55,8 +64,8 @@ bool PushButtonTapsAndPress::buttonActiveDebounced() {
     return reading2;  //active high
 }
 
-/* Get button tap status in ButtonTapType enum class variable as output. Includes 1 microsecond for debounce */
-ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
+/* Get button tap status in an 8 bit unsigned integer as output. Includes 1 microsecond for debounce */
+byte PushButtonTapsAndPress::checkButtonStatus() {
   /*  Assumption: Microcontroller checks Button Status every 50 milliseconds or faster
       Cases:
         1. No Tap
@@ -68,17 +77,17 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
         4. Long Tap
             (_currentTapIntermediateValue == 1   &&   (millis() - _lastButtonPressStartTimeMs) > MIN_LONG_PRESS_TIME_MS)
   */
-  ButtonTapType _currentButtonTap = ButtonTapType::noTap;
+  byte _currentButtonTap = 0;
 
   if(buttonActiveDebounced() && !_lastStateActive) {
     // push button went from low to high
     // can be a double tap
 
     // if single tap has already happened and this tap is before MAX_TIME_GAP_IN_DOUBLE_TAP_MS
-    if(_currentTapIntermediateValue == ButtonTapType::singleTap) {
+    if(_currentTapIntermediateValue == 1) {
       // it is a double tap!
-      _currentButtonTap = ButtonTapType::doubleTap;
-      _currentTapIntermediateValue = ButtonTapType::doubleTap;
+      _currentButtonTap = 2;
+      _currentTapIntermediateValue = 2;
       _firstTapMs = _lastButtonPressEndTimeMs - _lastButtonPressStartTimeMs;
       _lastButtonPressStartTimeMs = millis();
       _gapBetweenTapsMs = _lastButtonPressStartTimeMs - _lastButtonPressEndTimeMs;
@@ -95,9 +104,9 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
       }
     }
     // if this is the first tap
-    else if(_currentTapIntermediateValue == ButtonTapType::noTap) {
-      _currentButtonTap = ButtonTapType::noTap;
-      _currentTapIntermediateValue = ButtonTapType::singleTap;
+    else if(_currentTapIntermediateValue == 0) {
+      _currentButtonTap = 0;
+      _currentTapIntermediateValue = 1;
       _lastButtonPressStartTimeMs = millis();
       _lastStateActive = true;
     }
@@ -107,10 +116,10 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
     // push button continues to be in high state
     // can be a long press
 
-    if(_currentTapIntermediateValue == ButtonTapType::singleTap && (millis() - _lastButtonPressStartTimeMs >= MIN_LONG_PRESS_TIME_MS)) {
+    if(_currentTapIntermediateValue == 1 && (millis() - _lastButtonPressStartTimeMs >= MIN_LONG_PRESS_TIME_MS)) {
       // it is a long press!
-      _currentButtonTap = ButtonTapType::longPress;
-      _currentTapIntermediateValue = ButtonTapType::longPress;
+      _currentButtonTap = 3;
+      _currentTapIntermediateValue = 3;
       if(_serialPrintButtonPressTimes) {
         Serial.print("LONG PRESS ");
       }
@@ -122,8 +131,8 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
     _lastButtonPressEndTimeMs = millis();
     _lastStateActive = false;
     // reset double tap
-    if(_currentTapIntermediateValue == ButtonTapType::doubleTap) {
-      _currentTapIntermediateValue = ButtonTapType::noTap;
+    if(_currentTapIntermediateValue == 2) {
+      _currentTapIntermediateValue = 0;
       _secondTapMs = _lastButtonPressEndTimeMs - _lastButtonPressStartTimeMs;
       if(_serialPrintButtonPressTimes) {
         // second tap time
@@ -133,8 +142,8 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
       }
     }
     // reset long press
-    else if(_currentTapIntermediateValue == ButtonTapType::longPress) {
-      _currentTapIntermediateValue = ButtonTapType::noTap;
+    else if(_currentTapIntermediateValue == 3) {
+      _currentTapIntermediateValue = 0;
       _firstTapMs = _lastButtonPressEndTimeMs - _lastButtonPressStartTimeMs;
       _gapBetweenTapsMs = 0;
       _secondTapMs = 0;
@@ -150,10 +159,10 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
     // push button continues to be in low state
     // last tap can be a single tap
 
-    if(_currentTapIntermediateValue == ButtonTapType::singleTap && (millis() - _lastButtonPressEndTimeMs >= MAX_TIME_GAP_IN_DOUBLE_TAP_MS)) {
+    if(_currentTapIntermediateValue == 1 && (millis() - _lastButtonPressEndTimeMs >= MAX_TIME_GAP_IN_DOUBLE_TAP_MS)) {
       // it is a single tap!
-      _currentButtonTap = ButtonTapType::singleTap;
-      _currentTapIntermediateValue = ButtonTapType::noTap;
+      _currentButtonTap = 1;
+      _currentTapIntermediateValue = 0;
       _firstTapMs = _lastButtonPressEndTimeMs - _lastButtonPressStartTimeMs;
       _gapBetweenTapsMs = 0;
       _secondTapMs = 0;
@@ -163,9 +172,9 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
         Serial.println("ms");
       }
     }
-    else if(_currentTapIntermediateValue == ButtonTapType::noTap) {
+    else if(_currentTapIntermediateValue == 0) {
       // there continues to be no tap
-      _currentButtonTap = ButtonTapType::noTap;
+      _currentButtonTap = 0;
     }
     
   }
@@ -174,7 +183,7 @@ ButtonTapType PushButtonTapsAndPress::checkButtonStatus() {
 
 /* Get tap times once Button Pin turns Off */
 void PushButtonTapsAndPress::getLastTapTimes(bool &dataReady, uint16_t &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs) {
-  dataReady = _currentTapIntermediateValue == ButtonTapType::noTap;
+  dataReady = _currentTapIntermediateValue == 0;
   firstTapMs = _firstTapMs;
   gapBetweenTapsMs = _gapBetweenTapsMs;
   secondTapMs = _secondTapMs;
