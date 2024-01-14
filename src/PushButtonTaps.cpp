@@ -1,7 +1,7 @@
 /*
   Prashant Kumar
   Push Button Taps And Press
-  https://github.com/pk17r/PushButtonTapsAndPress
+  https://github.com/pk17r/PushButtonTaps
 
   - Arduino library to read Debounced Push Button Output as Single Tap, Double
     Tap or Long Press without using while statements or blocking program flow
@@ -24,32 +24,32 @@
     &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs)
 */
 
-#include "PushButtonTapsAndPress.h"
+#include "PushButtonTaps.h"
 #define _serialPrintButtonPressTimes 0
 
 /* Constructor */
-PushButtonTapsAndPress::PushButtonTapsAndPress() {
+PushButtonTaps::PushButtonTaps() {
 }
 
 /* Constructor with button pin initialization */
-PushButtonTapsAndPress::PushButtonTapsAndPress(uint8_t buttonPin) {
+PushButtonTaps::PushButtonTaps(uint8_t buttonPin) {
   setButtonPin(buttonPin);
 }
 
 /* Function to initialize button pin */
-void PushButtonTapsAndPress::setButtonPin(uint8_t buttonPin) {
+void PushButtonTaps::setButtonPin(uint8_t buttonPin) {
   //initialize button
   _BUTTON_PIN = buttonPin;
   pinMode(_BUTTON_PIN, INPUT);
 }
 
 /* Function to set button as Active Low or High. Default Active Low true */
-void PushButtonTapsAndPress::setButtonActiveLow(bool activeLow) {
+void PushButtonTaps::setButtonActiveLow(bool activeLow) {
   _activeLow = activeLow;
 }
 
 /* Get debounced active status of button. Includes 1 microsecond for debounce */
-bool PushButtonTapsAndPress::buttonActiveDebounced() {
+bool PushButtonTaps::buttonActiveDebounced() {
   uint8_t reading1 = digitalRead(_BUTTON_PIN);
   delayMicroseconds(1);
   uint8_t reading2 = digitalRead(_BUTTON_PIN);
@@ -65,7 +65,7 @@ bool PushButtonTapsAndPress::buttonActiveDebounced() {
 }
 
 /* Get button tap status in an 8 bit unsigned integer as output. Includes 1 microsecond for debounce */
-byte PushButtonTapsAndPress::checkButtonStatus() {
+byte PushButtonTaps::checkButtonStatus() {
   /*  Assumption: Microcontroller checks Button Status every 50 milliseconds or faster
       Cases:
         1. No Tap
@@ -182,7 +182,7 @@ byte PushButtonTapsAndPress::checkButtonStatus() {
 }
 
 /* Get tap times once Button Pin turns Off */
-void PushButtonTapsAndPress::getLastTapTimes(bool &dataReady, uint16_t &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs) {
+void PushButtonTaps::getLastTapTimes(bool &dataReady, uint16_t &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs) {
   dataReady = _currentTapIntermediateValue == 0;
   firstTapMs = _firstTapMs;
   gapBetweenTapsMs = _gapBetweenTapsMs;

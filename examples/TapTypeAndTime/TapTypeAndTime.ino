@@ -1,7 +1,7 @@
 /*
   Prashant Kumar
   Push Button Taps And Press
-  https://github.com/pk17r/PushButtonTapsAndPress
+  https://github.com/pk17r/PushButtonTaps
 
   - Arduino library to read Debounced Push Button Output as Single Tap, Double
     Tap or Long Press without using while statements or blocking program flow
@@ -24,10 +24,10 @@
     &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs)
 */
 
-#include "PushButtonTapsAndPress.h"
+#include "PushButtonTaps.h"
 
 const int BUTTON_PIN = 17;
-PushButtonTapsAndPress pushBtn;
+PushButtonTaps pushBtn;
 
 int tapsRecorded = 0;
 int tapTimesRead = 0;

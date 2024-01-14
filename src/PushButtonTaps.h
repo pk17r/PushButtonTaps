@@ -1,7 +1,7 @@
 /*
   Prashant Kumar
   Push Button Taps And Press
-  https://github.com/pk17r/PushButtonTapsAndPress
+  https://github.com/pk17r/PushButtonTaps
 
   - Arduino library to read Debounced Push Button Output as Single Tap, Double
     Tap or Long Press without using while statements or blocking program flow
@@ -24,12 +24,12 @@
     &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs)
 */
 
-#ifndef PUSH_BUTTON_TAPS_AND_PRESS_H
-#define PUSH_BUTTON_TAPS_AND_PRESS_H
+#ifndef PUSH_BUTTON_TAPS_H
+#define PUSH_BUTTON_TAPS_H
 
 #include <Arduino.h>
 
-class PushButtonTapsAndPress {
+class PushButtonTaps {
   public: 
     /* To note if current tap is single tap or double tap, library will wait 
     MAX_TIME_GAP_IN_DOUBLE_TAP_MS milliseconds to declare a tap as Single Tap
@@ -40,9 +40,9 @@ class PushButtonTapsAndPress {
     const uint16_t MIN_LONG_PRESS_TIME_MS = 650;
 
     /* Constructor */
-    PushButtonTapsAndPress();
+    PushButtonTaps();
     /* Constructor with button pin initialization */
-    PushButtonTapsAndPress(uint8_t buttonPin);
+    PushButtonTaps(uint8_t buttonPin);
     /* Function to initialize button pin */
     void setButtonPin(uint8_t buttonPin);
     /* Function to set button as Active Low or High. Default Active Low true */

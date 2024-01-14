@@ -1,4 +1,4 @@
-# Push Button Taps And Press
+# Push Button Taps
 
 Arduino library to read Debounced Push Button Output as Single Tap, Double
 Tap or Long Press without using while statements or blocking program flow

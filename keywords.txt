@@ -1,10 +1,10 @@
 ##########################################
 # Syntax Coloring Map For
 ##########################################
-# PushButtonTapsAndPress Class
+# PushButtonTaps Class
 ##########################################
 
-PushButtonTapsAndPress    KEYWORD1
+PushButtonTaps	KEYWORD1
 
 ##########################################
 # Methods and Functions 
