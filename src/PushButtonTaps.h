@@ -1,10 +1,10 @@
 /*
   Prashant Kumar
-  Push Button Taps And Press
+  Push Button Taps
   https://github.com/pk17r/PushButtonTaps
 
   - Arduino library to read Debounced Push Button Output as Single Tap, Double
-    Tap or Long Press without using while statements or blocking program flow
+    Tap or Long Press without blocking program flow
   - classifies taps as one of 4 types
     - 0 -> noTap
     - 1 -> singleTap
@@ -12,12 +12,13 @@
     - 3 -> longPress
   - option to set button Active Low or High. Default Active Low
   - To classify the tap, there is some delay from user input to tap classification.
-  - Delays: 
+  - Delays in Read from User Input:
     - noTap -> 1 microsecond to debounce
-    - singleTap -> 250 milliseconds from button deactivation to give user time for doubleTap
+    - singleTap -> 150 milliseconds from button deactivation to give user time for doubleTap
     - doubleTap -> as soon as second tap occurs
-    - longPress -> as soon as button is pressed for 650 milliseconds
+    - longPress -> as soon as button is pressed for 500 milliseconds
   - How to use:
+  - put the desired function inside loop() function, as shown in example
   - get classified button tap byte using checkButtonStatus()
   - get button active state using buttonActiveDebounced()
   - get last button press times use getLastTapTimes(bool &dataReady, uint16_t
@@ -34,10 +35,10 @@ class PushButtonTaps {
     /* To note if current tap is single tap or double tap, library will wait 
     MAX_TIME_GAP_IN_DOUBLE_TAP_MS milliseconds to declare a tap as Single Tap
     or Double Tap. This will not be a program blocking wait. */
-    const uint8_t MAX_TIME_GAP_IN_DOUBLE_TAP_MS = 250;
+    const uint8_t MAX_TIME_GAP_IN_DOUBLE_TAP_MS = 150;
     /* Minimum time user will need to press and hold button
     to classify it as a long press */
-    const uint16_t MIN_LONG_PRESS_TIME_MS = 650;
+    const uint16_t MIN_LONG_PRESS_TIME_MS = 500;
 
     /* Constructor */
     PushButtonTaps();
