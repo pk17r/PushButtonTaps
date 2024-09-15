@@ -28,13 +28,7 @@
 #include <PushButtonTaps.h>
 
 const int BUTTON_PIN = 4;
-PushButtonTaps pushBtn;
-
-int tapsRecorded = 0;
-int tapTimesRead = 0;
-uint16_t firstTapMs;
-uint16_t gapBetweenTapsMs;
-uint16_t secondTapMs;
+PushButtonTaps* pushBtn = NULL;
 
 void setup() {
   Serial.begin(115200);
@@ -43,43 +37,17 @@ void setup() {
   }
   delay(500);
 
-  // button pin can be initialized here or directly at pushBtn decleration
-  // button pin is Pulled Up and will be set as Active Low
-  pushBtn.setButtonPin(BUTTON_PIN);
+  // button pin will be initialized as Pulled Up and Active Low state
+  pushBtn = new PushButtonTaps(BUTTON_PIN);
 
-  Serial.println("TAP TYPE   First : Gap : Second");
+  Serial.println("Button Pin set.");
 }
 
 void loop() {
-  // check for button tap
-  byte tap = pushBtn.checkButtonStatus();
-  if(tap != 0) {
-    switch(tap) {
-      case 1:
-        Serial.print("SINGLE TAP ");
-        break;
-      case 2:
-        Serial.print("DOUBLE TAP ");
-        break;
-      case 3:
-        Serial.print("LONG PRESS ");
-        break;
-    }
-    tapsRecorded++;
-  }
-  // get last tap times
-  bool dataReady = false;
-  if(tapTimesRead < tapsRecorded) {
-    pushBtn.getLastTapTimes(dataReady, firstTapMs, gapBetweenTapsMs, secondTapMs);
-    if(dataReady) {
-      tapTimesRead++;
-      Serial.print(firstTapMs);
-      Serial.print("ms : ");
-      Serial.print(gapBetweenTapsMs);
-      Serial.print("ms : ");
-      Serial.print(secondTapMs);
-      Serial.println("ms");
-    }
+  // note if button pressed
+  if(pushBtn->buttonActiveDebounced()) {
+    Serial.print(millis());
+    Serial.println(" : Button is pressed!");
   }
   delay(1);
 }

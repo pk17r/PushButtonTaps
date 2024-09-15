@@ -41,22 +41,27 @@ PushButtonTaps::PushButtonTaps(uint8_t buttonPin) {
 void PushButtonTaps::setButtonPin(uint8_t buttonPin) {
   //initialize button
   _BUTTON_PIN = buttonPin;
-  pinMode(_BUTTON_PIN, INPUT);
+  if(_activeLow)
+    pinMode(_BUTTON_PIN, INPUT_PULLUP);
+  else
+    pinMode(_BUTTON_PIN, INPUT);
 }
 
 /* Function to set button as Active Low or High. Default Active Low true */
 void PushButtonTaps::setButtonActiveLow(bool activeLow) {
   _activeLow = activeLow;
+  if(_BUTTON_PIN != -1)
+    setButtonPin(_BUTTON_PIN);
 }
 
-/* Get debounced active status of button. Includes 1 microsecond for debounce */
+/* Get debounced active status of button. Includes DEBOUNCE_TIME_US microsecond for debounce */
 bool PushButtonTaps::buttonActiveDebounced() {
   uint8_t reading1 = digitalRead(_BUTTON_PIN);
-  delayMicroseconds(1);
+  delayMicroseconds(DEBOUNCE_TIME_US);
   uint8_t reading2 = digitalRead(_BUTTON_PIN);
   while(reading2 != reading1) {
     reading1 = digitalRead(_BUTTON_PIN);
-    delayMicroseconds(1);
+    delayMicroseconds(DEBOUNCE_TIME_US);
     reading2 = digitalRead(_BUTTON_PIN);
   }
   if(_activeLow)
@@ -65,7 +70,13 @@ bool PushButtonTaps::buttonActiveDebounced() {
     return reading2;  //active high
 }
 
-/* Get button tap status in an 8 bit unsigned integer as output. Includes 1 microsecond for debounce */
+/* Get button tap status in an 8 bit unsigned integer as output. Includes DEBOUNCE_TIME_US microsecond for debounce
+- classifies taps as one of 4 types
+  - 0 -> noTap
+  - 1 -> singleTap
+  - 2 -> doubleTap
+  - 3 -> longPress
+ */
 byte PushButtonTaps::checkButtonStatus() {
   /*  Assumption: Microcontroller checks Button Status every 50 milliseconds or faster
       Cases:

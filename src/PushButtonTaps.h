@@ -14,9 +14,9 @@
   - To classify the tap, there is some delay from user input to tap classification.
   - Delays in Read from User Input:
     - noTap -> 1 microsecond to debounce
-    - singleTap -> 150 milliseconds from button deactivation to give user time for doubleTap
+    - singleTap -> 250 milliseconds from button deactivation to give user time for doubleTap
     - doubleTap -> as soon as second tap occurs
-    - longPress -> as soon as button is pressed for 500 milliseconds
+    - longPress -> as soon as button is pressed for 600 milliseconds
   - How to use:
   - put the desired function inside loop() function, as shown in example
   - get classified button tap byte using checkButtonStatus()
@@ -35,10 +35,12 @@ class PushButtonTaps {
     /* To note if current tap is single tap or double tap, library will wait 
     MAX_TIME_GAP_IN_DOUBLE_TAP_MS milliseconds to declare a tap as Single Tap
     or Double Tap. This will not be a program blocking wait. */
-    const uint8_t MAX_TIME_GAP_IN_DOUBLE_TAP_MS = 150;
+    const uint8_t MAX_TIME_GAP_IN_DOUBLE_TAP_MS = 250;
     /* Minimum time user will need to press and hold button
     to classify it as a long press */
-    const uint16_t MIN_LONG_PRESS_TIME_MS = 500;
+    const uint16_t MIN_LONG_PRESS_TIME_MS = 600;
+    /* Time between reads to debounce user-input */
+    const uint16_t DEBOUNCE_TIME_US = 20;
 
     /* Constructor */
     PushButtonTaps();
@@ -48,9 +50,15 @@ class PushButtonTaps {
     void setButtonPin(uint8_t buttonPin);
     /* Function to set button as Active Low or High. Default Active Low true */
     void setButtonActiveLow(bool activeLow);
-    /* Get debounced active status of button. Includes 1 microsecond for debounce */
+    /* Get debounced active status of button. Includes DEBOUNCE_TIME_US microsecond for debounce */
     bool buttonActiveDebounced();
-    /* Get button tap status in an 8 bit unsigned integer as output. Includes 1 microsecond for debounce */
+    /* Get button tap status in an 8 bit unsigned integer as output. Includes DEBOUNCE_TIME_US microsecond for debounce
+    - classifies taps as one of 4 types
+      - 0 -> noTap
+      - 1 -> singleTap
+      - 2 -> doubleTap
+      - 3 -> longPress
+    */
     byte checkButtonStatus();
     /* Get tap times once Button Pin turns Off */
     void getLastTapTimes(bool &dataReady, uint16_t &firstTapMs, uint16_t &gapBetweenTapsMs, uint16_t &secondTapMs);
